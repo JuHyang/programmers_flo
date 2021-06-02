@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.gson.JsonObject
 import juhyang.practice.flo_programmers.R
+import juhyang.practice.flo_programmers.lyric.Lyric
 import juhyang.practice.flo_programmers.retrofit.MusicHelper
 import kotlinx.coroutines.*
 
@@ -46,7 +47,6 @@ class MusicViewModel : ViewModel() {
             }
         }
     }
-
 
     private var musicInform: JsonObject = JsonObject()
 
@@ -104,11 +104,21 @@ class MusicViewModel : ViewModel() {
             return _isPlaying
         }
 
+    private val _lyricList : MutableLiveData<ArrayList<Lyric>> = MutableLiveData<ArrayList<Lyric>>()
+    val lyricList : LiveData<ArrayList<Lyric>>
+        get() {
+            return _lyricList
+        }
 
-    private val lyricList : ArrayList<Lyric> = ArrayList()
+    private val _visibleMainLayout = MutableLiveData<Boolean>()
+    val visibleMainLayout : LiveData<Boolean>
+        get() {
+            return _visibleMainLayout
+        }
 
     init {
         _currentTime.value = 1
+        _visibleMainLayout.value = true
     }
 
     var mediaPlayer = MediaPlayer()
@@ -133,9 +143,12 @@ class MusicViewModel : ViewModel() {
 
     private fun makeLyricList(lyrics : String) {
         val lyricTempList = lyrics.split("\n")
+        val resultLyricList = ArrayList<Lyric>()
         for (lyric in lyricTempList) {
-            lyricList.add(Lyric(lyric))
+            resultLyricList.add(Lyric(lyric))
         }
+
+        _lyricList.value = resultLyricList
     }
 
     private fun setMusic() {
@@ -181,22 +194,38 @@ class MusicViewModel : ViewModel() {
         )
     }
 
+    var beforeCurrent = -1
     fun setCurrentLyric(currentTime: Int) {
+        val lyricList = lyricList.value ?: return
         if (lyricList.size == 0) return
         if (lyricList[0].time > currentTime) {
             _currentLyric.value = ""
             _nextLyric.value = lyricList[0].text
-            return
         } else {
+            var status = true
             for (i in 1 until lyricList.size) {
-                if (lyricList[i - 1].time < currentTime && currentTime < lyricList[i].time) {
+                if (lyricList[i - 1].time <= currentTime && currentTime < lyricList[i].time) {
+                    if (beforeCurrent != -1) {
+                        lyricList[beforeCurrent].isCurrent = false
+                    }
+                    lyricList[i - 1].isCurrent = true
+                    beforeCurrent = i - 1
                     _currentLyric.value = lyricList[i - 1].text
                     _nextLyric.value = lyricList[i].text
-                    return
+                    status = false
+                    break
                 }
             }
-            _currentLyric.value = lyricList.last().text
-            _nextLyric.value = ""
+            if (status) {
+                _currentLyric.value = lyricList.last().text
+                _nextLyric.value = ""
+            }
         }
+
+        _lyricList.value = lyricList
+    }
+
+    fun changeMainLayout() {
+        _visibleMainLayout.value = visibleMainLayout.value != true
     }
 }
