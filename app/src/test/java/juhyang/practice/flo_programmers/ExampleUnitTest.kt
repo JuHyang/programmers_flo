@@ -1,5 +1,7 @@
 package juhyang.practice.flo_programmers
 
+import android.util.Log
+import juhyang.practice.flo_programmers.retrofit.MusicHelper
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -12,6 +14,9 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+        val musicHelper = MusicHelper()
+        musicHelper.getMusic {
+            Log.d("hyang@it", "${it}")
+        }
     }
 }
