@@ -121,8 +121,8 @@ class MusicViewModel : ViewModel() {
         _visibleMainLayout.value = true
     }
 
-    var mediaPlayer = MediaPlayer()
-    var musicFile = ""
+    private var mediaPlayer = MediaPlayer()
+    private var musicFile = ""
 
     fun getMusicInform() {
         val musicHelper = MusicHelper()
@@ -194,7 +194,7 @@ class MusicViewModel : ViewModel() {
         )
     }
 
-    var beforeCurrent = -1
+    private var beforeCurrent = -1
     fun setCurrentLyric(currentTime: Int) {
         val lyricList = lyricList.value ?: return
         if (lyricList.size == 0) return
@@ -217,6 +217,11 @@ class MusicViewModel : ViewModel() {
                 }
             }
             if (status) {
+                if (beforeCurrent != -1) {
+                    lyricList[beforeCurrent].isCurrent = false
+                }
+                lyricList.last().isCurrent = true
+                beforeCurrent = lyricList.size - 1
                 _currentLyric.value = lyricList.last().text
                 _nextLyric.value = ""
             }

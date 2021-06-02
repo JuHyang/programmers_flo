@@ -53,6 +53,8 @@ class LyricAdapter(val lyricClick : (lyric : Lyric) -> Unit) : RecyclerView.Adap
             binding.root.setOnClickListener {
                 lyricClick(lyric)
             }
+
+            binding.executePendingBindings() // 이걸 안해주면 다음 프레임에서 업데이트를 한다. 이를 해줌으로써 즉시 화면 업데이트 진행 한다.
         }
     }
 }

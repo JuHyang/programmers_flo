@@ -19,7 +19,7 @@ import juhyang.practice.flo_programmers.lyric.LyricAdapter
 class MusicActivity : AppCompatActivity() {
 
     val musicViewModel : MusicViewModel by viewModels()
-    lateinit var binding : ActivityMusicBinding
+    private lateinit var binding : ActivityMusicBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +35,7 @@ class MusicActivity : AppCompatActivity() {
         aboutView()
     }
 
-    fun initRecycler() {
+    private fun initRecycler() {
         val lyricAdapter = LyricAdapter { lyric ->
             musicViewModel.setCurrentTime(lyric.time.toInt())
         }
@@ -56,13 +56,13 @@ class MusicActivity : AppCompatActivity() {
         })
     }
 
-    fun setObserver() {
+    private fun setObserver() {
         musicViewModel.currentTime.observe(this, Observer {
             musicViewModel.setCurrentLyric(it)
         })
     }
 
-    fun aboutView() {
+    private fun aboutView() {
         binding.songSeekbar.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
